@@ -1,2 +1,33 @@
 **********************************************************************Sentiment Analysis*********************************************************************************
 
+# sentiment analysis of a text
+
+# lexicons (bing and nrc are lexicons)
+library(tidytext)
+a=get_sentiments("bing")
+b=get_sentiments("nrc")
+b
+sentence=" I bought an iPhone a few days ago.
+It is such a nice phone, although a little large.
+The touch screen is cool.The voice quality is clear too.
+I simply love it!"
+
+sentiment=get_nrc_sentiment(sentence)
+View(sentiment)
+
+# Sentiment analysis from twitter
+
+mysentiment <- get_nrc_sentiment(some_txt5)
+SentimentScores <- data.frame(colSums(mysentiment[,]))
+names(SentimentScores) <- "Score"
+SentimentScores <- cbind("sentiment" = rownames(SentimentScores), SentimentScores)
+rownames(SentimentScores) <- NULL
+
+
+dev.off()
+ggplot(data = SentimentScores, aes(x = sentiment, y = Score)) +
+  geom_bar(aes(fill = sentiment), stat = "identity") +
+  theme(legend.position = "none") +
+  xlab("Sentiment") + ylab("Score") + ggtitle("Total Sentiment Score Based on Tweets")
+
+
