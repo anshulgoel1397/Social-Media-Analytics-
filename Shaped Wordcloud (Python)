@@ -1,0 +1,36 @@
+
+**************************************************Making Wordcloud in python********************************************
+
+
+
+
+import csv
+import numpy as np
+# Python Imaging Library is a free and open-source additional library for the Python programming language that adds support for opening, manipulating, and saving many different 
+image file formats.
+from PIL import Image
+
+
+#Word Cloud is a data visualization technique used for representing text data in which the size of each word indicates its frequency or importance.
+from wordcloud import Wordcloud
+
+#initializing string array and writing cleaned tweets
+text=[]
+with open('C://Users//shilp//Documents//tweets1.csv', newline='') as csvfile:
+    reader = csv.reader(csvfile)
+    for row in reader:
+        text.append(row[1])
+text = ' '.join(text)
+
+#importing image
+alice_mask=np.array(Image.open("C://Users//shilp//Desktop//alice_mask.png"))
+
+# Genrating wordcloud
+wordcloud1=WordCloud(mask=alice_mask, max_words=200,background_color="white").generate(text)
+
+#Plotting 
+# The imshow() function in pyplot module of matplotlib library is used to display data as an image; i.e. on a 2D regular raster.
+import matplotlib.pyplot as plt
+plt.imshow(wordcloud1, interpolation='bilinear')
+plt.axis("off")
+
