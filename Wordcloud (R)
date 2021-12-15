@@ -1,0 +1,88 @@
+************************************************************************ Wordcloud in R *************************************************************************
+
+#importing libraries
+library(twitteR)
+library(ROAuth)
+library(plyr)
+library(dplyr)
+library(ggplot2)
+library(syuzhet)
+library(tm)
+library(wordcloud)
+library(httr)
+library(RCurl)
+library(stringr)
+library(httpuv)
+library(openssl)
+
+api_key = "R7gsoC2ocY8mDKCHq254FeWJH"
+api_secret ="e40V9N6VhEi6HWIspMdggS5Uk0hPjsKi1aSGHZfDQWjp0WlmfE"
+access_token ="3189853406-bNVkazByM5Dnj3UWusrhVkxS3b9yKSqIzrmM5p6"
+access_secret = "H6U4Muox3R1ecLs37o39wxLhvbHCVYOJNpZW2djbTmynH"
+
+# Setup the OAuth
+setup_twitter_oauth(api_key, api_secret,
+                    access_token = access_token,
+                    access_secret = access_secret)
+                    
+                    
+# Getting trend locations                    
+all_locations=availableTrendLocations()
+all_locations
+woe_id= subset(all_locations, name=='Bangalore')$woeid
+
+
+# find out trending topics
+woe_id
+trending_topics = getTrends(woe_id)
+trending_topics
+tweets= searchTwitter(searchString="protest",n=200,lang="en")
+tweets
+
+# Converting tweets to dataframe
+tweets_df=ldply(tweets,function(t)t$toDataFrame())
+View(tweets_df)
+write.csv(tweets_df,"C://Users//shilp//Desktop//Assignments//Semester 2//Social Media Analytics//tweets.csv")
+
+#Step 3: Data cleaning
+"C:\Users\shilp\Desktop\tweets.csv"
+text=sapply(tweets, function(x)x$getText())
+text
+
+# Cleaning 1- remove people name, RT text etc.
+some_txt1 = gsub("(RT|via)((?:\\b\\W*@\\w+)+)","", text)
+some_txt1
+
+ # Cleaning 2 remove html links, replace with blanks
+# match everything except a,b,c
+#[^abc] --> match everything except abc 
+some_txt2 = gsub("http[^[:blank:]]+", "", some_txt1)
+
+#cleaning 3: remove people names, replace anything starting with @, replace with empty string
+some_txt3 = gsub("@\\w+", "", some_txt2)
+
+# cleaning 4: remove all punctuations
+some_txt4 = gsub("[[:punct:]]", " ", some_txt3)
+some_txt4
+
+#Cleaning 5- remove non-alphanumeric words
+some_txt5 = gsub("[^[:alnum:]]", " ", some_txt4)
+
+# export to excel
+
+write.csv(some_txt5,"tweets1.csv")
+# creating worcopus and cleaning
+# corpus is collection of text or documents on which certain kind of algorithms can be applied faster
+some_txt6= Corpus(VectorSource(some_txt5))
+some_txt6= tm_map(some_txt6, removePunctuation)
+some_txt6= tm_map(some_txt6, content_transformer(tolower))
+some_txt6= tm_map(some_txt6, removeWords, stopwords("english"))
+some_txt6= tm_map(some_txt6,stripWhitespace)
+
+some_txt6[[120]]$content
+
+# Building wordcloud
+pal = brewer.pal(8,"Dark2")
+wordcloud(some_txt6, min.freq = 10, max.words = Inf,
+          width=1000, height =1000, random.order = FALSE, color=pal)
+
